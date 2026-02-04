@@ -1,0 +1,29 @@
+# Environment and secrets
+.env
+*.env.local
+.env.*.local
+
+# Build artifacts
+bin/
+obj/
+out/
+*.dll
+*.pdb
+*.user
+*.suo
+*.cache
+
+# IDE
+.idea/
+.vscode/*.log
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NuGet
+packages/
+*.nupkg

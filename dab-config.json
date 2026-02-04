@@ -1,0 +1,97 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v1.7.86/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('MSSQL_CONNECTION_STRING')",
+    "options": {
+      "set-session-context": false
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api",
+      "request-body-strict": true
+    },
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp"
+    },
+    "host": {
+      "cors": {
+        "origins": [],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "AppService"
+      },
+      "mode": "development"
+    }
+  },
+  "entities": {
+    "Products": {
+      "description": "Product catalog with name, description, price, and stock.",
+      "source": {
+        "object": "dbo.Products",
+        "type": "table"
+      },
+      "fields": [
+        {
+          "name": "Id",
+          "description": "Product unique identifier",
+          "primary-key": true
+        },
+        {
+          "name": "Name",
+          "description": "Product name",
+          "primary-key": false
+        },
+        {
+          "name": "Description",
+          "description": "Product description",
+          "primary-key": false
+        },
+        {
+          "name": "Price",
+          "description": "Retail price",
+          "primary-key": false
+        },
+        {
+          "name": "Stock",
+          "description": "Units in stock",
+          "primary-key": false
+        },
+        {
+          "name": "CreatedAt",
+          "description": "When the product was added",
+          "primary-key": false
+        }
+      ],
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Products",
+          "plural": "Products"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
