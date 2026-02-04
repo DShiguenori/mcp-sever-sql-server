@@ -78,14 +78,19 @@ The server listens on:
 - **REST API:** http://localhost:5000/api
 - **GraphQL:** http://localhost:5000/graphql
 
-### 5. Connect from VS Code
+### 5. Connect from your IDE
 
+**VS Code:**
 1. Open this project folder in VS Code.
 2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux).
 3. Run **MCP: List Servers**.
 4. Select **sql-mcp-server** and choose **Start**.
 
-The `.vscode/mcp.json` file is preconfigured to connect to `http://localhost:5000/mcp`.
+**Cursor:**
+1. Open this project folder in Cursor.
+2. Ensure the DAB server is running (`dab start --config dab-config.json`).
+3. The `.cursor/mcp.json` file is preconfigured — Cursor will detect **sql-mcp-server** automatically.
+4. In chat, the AI can use the SQL MCP tools to query your database. Try: *"Which products have stock under 50?"*
 
 ---
 
@@ -99,8 +104,10 @@ The `.vscode/mcp.json` file is preconfigured to connect to `http://localhost:500
 ├── .gitignore
 ├── scripts/
 │   └── init-db.sql     # Database creation and seed script
+├── .cursor/
+│   └── mcp.json        # Cursor MCP server definition
 └── .vscode/
-    └── mcp.json       # VS Code MCP server definition
+    └── mcp.json        # VS Code MCP server definition
 ```
 
 ---
@@ -127,6 +134,21 @@ docker start sql-products
 # Remove (data is lost)
 docker rm -f sql-products
 ```
+
+---
+
+---
+
+## Phase 2: Deploy to Azure (Optional)
+
+To host the MCP server on Azure Container Apps:
+
+1. Install Azure CLI: `brew install azure-cli`
+2. Sign in: `az login` and `az account set --subscription "<id>"`
+3. Set a strong password: `export SQL_PASSWORD='YourStrong@Passw0rd'`
+4. Run: `./scripts/deploy-azure.sh`
+
+See [plan.md](plan.md) for full Phase 2 details.
 
 ---
 

@@ -43,7 +43,7 @@ A learning project to build an MCP (Model Context Protocol) server that exposes 
 
 ## Phases
 
-### Phase 1: Local Setup & GitHub (Current)
+### Phase 1: Local Setup & GitHub ✓ Complete
 
 **Goal:** Run SQL MCP Server locally and establish version control.
 
@@ -133,11 +133,14 @@ A learning project to build an MCP (Model Context Protocol) server that exposes 
 LearningMCP AudioControl/
 ├── plan.md                 # This file
 ├── README.md               # Setup and usage instructions
-├── dab-config.json         # Data API Builder / MCP config
+├── dab-config.json         # Data API Builder / MCP config (local dev)
+├── dab-config.azure.json   # Production config for Azure deployment
 ├── Dockerfile              # For Azure Container Apps deployment
 ├── .env.example            # Template for connection string (no secrets)
 ├── .gitignore
-└── scripts/                # Optional: deployment scripts
+├── .cursor/mcp.json        # Cursor MCP server definition
+├── .vscode/mcp.json        # VS Code MCP server definition
+└── scripts/                # init-db.sql, init-db-azure.sql, deploy-azure.sh
 ```
 
 ---
