@@ -62,15 +62,15 @@ A learning project to build an MCP (Model Context Protocol) server that exposes 
    - [x] Add field descriptions with `dab update` (optional but recommended)
 
 4. **Run Locally**
-   - [ ] Start server: `dab start --config dab-config.json`
-   - [ ] Verify MCP endpoint: `http://localhost:5000/mcp`
-   - [ ] Test with VS Code (MCP: List Servers → connect to `sql-mcp-server`)
+   - [x] Start server: `dab start --config dab-config.json`
+   - [x] Verify MCP endpoint: `http://localhost:5000/mcp`
+   - [x] Test with VS Code (MCP: List Servers → connect to `sql-mcp-server`)
 
 5. **GitHub**
-   - [ ] Initialize git repo
-   - [ ] Create `.gitignore` (exclude `.env`, secrets, build artifacts)
-   - [ ] Push to GitHub
-   - [ ] Document setup in README
+   - [x] Initialize git repo
+   - [x] Create `.gitignore` (exclude `.env`, secrets, build artifacts)
+   - [x] Push to GitHub
+   - [x] Document setup in README
 
 **Reference:** [SQL MCP Server - VS Code Quickstart](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/quickstart-visual-studio-code)
 
