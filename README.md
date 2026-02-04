@@ -1,180 +1,99 @@
-# SQL MCP Server
+# AudioControl MCP Server
 
-A Model Context Protocol (MCP) server that exposes SQL Server data to AI agents. Built with [Data API Builder](https://learn.microsoft.com/en-us/azure/data-api-builder/) and designed to be consumed by clients like Discord bots or VS Code.
+An MCP (Model Context Protocol) server built from scratch with Node.js and TypeScript. Connects to the **AudioControl** SQL Server database and exposes tools for AI agents (e.g., Cursor, VS Code, Discord bots).
 
 ## Prerequisites
 
-- **.NET 9+** — [Download](https://dotnet.microsoft.com/download)
-- **Data API Builder CLI** — Install with:
-  ```bash
-  dotnet tool install microsoft.dataapibuilder --prerelease --global
-  ```
-- **SQL Server** — LocalDB, Docker, or SQL Server Express
-
-### Optional: Add DAB to your PATH
-
-If `dab` is not found after installation:
-
-```bash
-export PATH="$PATH:$HOME/.dotnet/tools"
-export DOTNET_ROOT=$HOME/.dotnet   # Required on some systems
-```
-
-Add these lines to your shell profile (`~/.zshrc` or `~/.bashrc`) for persistence.
-
-### .NET 8 required
-
-Data API Builder 1.7.x requires **.NET 8**. If you see "You must install or update .NET to run this application", install it:
-
-```bash
-brew install dotnet@8
-```
-
-Then ensure .NET 8 is used (or add it to your PATH if needed).
-
----
+- **Node.js 18+** — [Download](https://nodejs.org/)
+- **SQL Server** — LocalDB, Docker, or SQL Server Express with the AudioControl database
 
 ## Quick Start
 
-### 1. Clone the repository
+### 1. Install dependencies
 
 ```bash
-git clone https://github.com/DShiguenori/mcp-sever-sql-server.git
-cd mcp-sever-sql-server
+npm install
 ```
 
-### 2. Run SQL Server (Docker)
-
-Start SQL Server in a container:
-
-```bash
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" \
-  -p 1433:1433 --name sql-products --platform linux/amd64 -d \
-  mcr.microsoft.com/mssql/server:2022-latest
-```
-
-Wait ~15 seconds for SQL Server to start, then create the database:
-
-```bash
-docker cp scripts/init-db.sql sql-products:/tmp/init-db.sql
-docker exec sql-products /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa \
-  -P 'YourStrong@Passw0rd' -C -i /tmp/init-db.sql
-```
-
-### 3. Configure environment
-
-Copy the example env file and set your connection string:
+### 2. Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and ensure `MSSQL_CONNECTION_STRING` matches your SQL Server:
+Edit `.env` and set `AUDIOCONTROL_CONNECTION_STRING` to your SQL Server connection string:
 
 ```
-MSSQL_CONNECTION_STRING=Server=localhost,1433;Database=ProductsDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+AUDIOCONTROL_CONNECTION_STRING=Server=localhost,1433;Database=AudioControl;User Id=sa;Password=<YourPassword>;TrustServerCertificate=True;
 ```
 
 > **Security:** Never commit `.env` to version control. It is already in `.gitignore`.
 
-### 4. Start the MCP server
-
-Port 5050 is used (port 5000 is often taken by macOS Control Center). If you have .NET 8 via Homebrew (`brew install dotnet@8`):
+### 3. Start the MCP server
 
 ```bash
-export PATH="/opt/homebrew/opt/dotnet@8/bin:$HOME/.dotnet/tools:$PATH"
-export DOTNET_ROOT="/opt/homebrew/opt/dotnet@8/libexec"
-ASPNETCORE_URLS=http://localhost:5050 dab start --config dab-config.json
+npm run dev
 ```
 
-Or, if .NET 8 is your default:
+Or build and run:
 
 ```bash
-export PATH="$PATH:$HOME/.dotnet/tools"
-ASPNETCORE_URLS=http://localhost:5050 dab start --config dab-config.json
+npm run build
+npm start
 ```
 
-The server listens on:
-- **MCP endpoint:** http://localhost:5050/mcp
-- **REST API:** http://localhost:5050/api
-- **GraphQL:** http://localhost:5050/graphql
+### 4. Connect from Cursor or VS Code
 
-### 5. Connect from your IDE
+The project includes preconfigured MCP settings:
 
-**VS Code:**
-1. Open this project folder in VS Code.
-2. Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux).
-3. Run **MCP: List Servers**.
-4. Select **sql-mcp-server** and choose **Start**.
+- **Cursor:** `.cursor/mcp.json`
+- **VS Code:** `.vscode/mcp.json`
 
-**Cursor:**
-1. Open this project folder in Cursor.
-2. Ensure the DAB server is running (see step 4 above).
-3. The `.cursor/mcp.json` file is preconfigured — Cursor will detect **sql-mcp-server** automatically.
-4. In chat, the AI can use the SQL MCP tools to query your database. Try: *"Which products have stock under 50?"*
+1. Open this project folder in Cursor or VS Code.
+2. Run **MCP: List Servers** (Cmd+Shift+P / Ctrl+Shift+P).
+3. Select **audio-control** and start the server.
+4. In chat, ask questions like: *"What tables are in the AudioControl database?"* or *"Show me records from the Products table."*
 
----
+## Available Tools
 
-## Project structure
+| Tool | Description |
+|------|-------------|
+| `ping` | Verify the server is running |
+| `describe_entities` | List all tables and columns in the AudioControl database |
+| `read_records` | Query records from a table with optional filters and limit |
+
+## Project Structure
 
 ```
-├── README.md           # This file
-├── plan.md             # Project plan and phases
-├── dab-config.json     # Data API Builder / MCP configuration
-├── .env.example        # Template for connection string (no secrets)
-├── .gitignore
-├── scripts/
-│   └── init-db.sql     # Database creation and seed script
-├── .cursor/
-│   └── mcp.json        # Cursor MCP server definition
-└── .vscode/
-    └── mcp.json        # VS Code MCP server definition
+├── src/
+│   ├── index.ts           # MCP server entry point
+│   ├── db/
+│   │   ├── connection.ts  # SQL Server connection pool
+│   │   └── index.ts
+│   └── tools/
+│       ├── index.ts       # Tool registration
+│       ├── describe-entities.ts
+│       └── read-records.ts
+├── docs/
+│   └── schema.md          # AudioControl schema reference
+├── backup/                # Previous DAB project files
+├── .env.example
+├── package.json
+├── tsconfig.json
+├── plan.md
+└── README.md
 ```
 
----
+## Scripts
 
-## API endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/Products` | List all products |
-| `GET /api/Products/{id}` | Get product by ID |
-| `POST /api/Products` | Create product (if write permissions enabled) |
-
----
-
-## SQL Server container commands
-
-```bash
-# Stop
-docker stop sql-products
-
-# Start (after stopping)
-docker start sql-products
-
-# Remove (data is lost)
-docker rm -f sql-products
-```
-
----
-
----
-
-## Phase 2: Deploy to Azure (Optional)
-
-To host the MCP server on Azure Container Apps:
-
-1. Install Azure CLI: `brew install azure-cli`
-2. Sign in: `az login` and `az account set --subscription "<id>"`
-3. Set a strong password: `export SQL_PASSWORD='YourStrong@Passw0rd'`
-4. Run: `./scripts/deploy-azure.sh`
-
-See [plan.md](plan.md) for full Phase 2 details.
-
----
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Run server with tsx (no build) |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm start` | Run compiled server from `dist/` |
 
 ## References
 
-- [SQL MCP Server Overview](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/overview)
-- [Data API Builder Documentation](https://learn.microsoft.com/en-us/azure/data-api-builder/)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
+- [MCP TypeScript SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- [Build an MCP Server](https://modelcontextprotocol.io/docs/develop/build-server)

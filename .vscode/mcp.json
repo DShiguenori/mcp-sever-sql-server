@@ -1,8 +1,9 @@
 {
-  "servers": {
-    "sql-mcp-server": {
-      "type": "http",
-      "url": "http://localhost:5050/mcp"
+  "mcpServers": {
+    "audio-control": {
+      "command": "npx",
+      "args": ["tsx", "src/index.ts"],
+      "cwd": "/Users/danilouema/Work/LearningMCP AudioControl"
     }
   }
 }

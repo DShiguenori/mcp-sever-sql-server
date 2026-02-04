@@ -1,177 +1,105 @@
-# SQL MCP Server Learning Project — Plan
+# AudioControl MCP Server — Plan
 
-> **Purpose:** This document serves as the project plan and context reference for future development sessions. Use it to maintain continuity across new chats.
+> **Purpose:** Project plan and context reference for development sessions.
 
 ---
 
 ## Overview
 
-A learning project to build an MCP (Model Context Protocol) server that exposes SQL Server data to AI agents. The server will eventually be accessed by a Discord bot, allowing users to query the database through natural language chat.
+Build an MCP server from scratch using Node.js and TypeScript. The server connects to the **AudioControl** SQL Server database and exposes business-logic tools to AI agents (Cursor, VS Code, Discord bot).
 
 ### Key Components
 
 | Component | Technology | Status |
 |-----------|------------|--------|
-| **MCP Server** | Microsoft SQL MCP Server (Data API Builder) | Planned |
-| **Database** | SQL Server (local → Azure SQL) | Planned |
+| **MCP Server** | Node.js + TypeScript (@modelcontextprotocol/sdk) | Complete |
+| **Database** | SQL Server (AudioControl) | Complete |
 | **Version Control** | GitHub | Planned |
-| **Hosting** | Local → Azure Container Apps (MSDN) | Planned |
+| **Hosting** | Local → Azure Container Apps (later) | Planned |
 | **User Interface** | Discord Bot | Later phase |
-
----
-
-## Architecture
-
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Discord User   │────▶│   Discord Bot     │────▶│   MCP Server    │
-│  (chat)         │     │   (MCP Client +   │     │   (SQL tools)   │
-└─────────────────┘     │   LLM/OpenAPI)   │     └────────┬────────┘
-                         └────────┬─────────┘              │
-                                  │                        │
-                                  │                        ▼
-                                  │               ┌─────────────────┐
-                                  └──────────────▶│  SQL Server DB  │
-                                    OpenAPI key   └─────────────────┘
-```
-
-- **MCP Server** and **Discord Bot** are separate services (not built into each other).
-- **MCP Server** uses Streamable HTTP transport for remote access.
-- **Discord Bot** acts as an MCP client and uses an OpenAPI key for the LLM.
 
 ---
 
 ## Phases
 
-### Phase 1: Local Setup & GitHub ✓ Complete
+### Phase 1: Backup Current Project — Complete
 
-**Goal:** Run SQL MCP Server locally and establish version control.
+- [x] Create `backup/` folder
+- [x] Move DAB configs, Dockerfile, plan, README, scripts, .vscode to backup
 
-1. **Prerequisites**
-   - [x] Install .NET 9+
-   - [x] Install Data API Builder CLI: `dotnet tool install microsoft.dataapibuilder --prerelease`
-   - [x] SQL Server access (LocalDB, Docker, or SQL Server Express)
+### Phase 2: Initialize Node.js + TypeScript Project — Complete
 
-2. **Database**
-   - [x] Create sample database (e.g., `ProductsDb`)
-   - [x] Create and seed tables (e.g., `Products`)
+- [x] Create `package.json` with dependencies
+- [x] Create `tsconfig.json`
+- [x] Create `src/index.ts` with MCP server skeleton
+- [x] Update `.gitignore`
 
-3. **MCP Server Configuration**
-   - [x] Create `dab-config.json` with `dab init`
-   - [x] Add entities with `dab add`
-   - [x] Add field descriptions with `dab update` (optional but recommended)
+### Phase 3: Database Connection and Environment — Complete
 
-4. **Run Locally**
-   - [x] Start server: `dab start --config dab-config.json`
-   - [x] Verify MCP endpoint: `http://localhost:5000/mcp`
-   - [x] Test with VS Code (MCP: List Servers → connect to `sql-mcp-server`)
+- [x] Update `.env.example` with `AUDIOCONTROL_CONNECTION_STRING`
+- [x] Create `src/db/connection.ts` (mssql pool, singleton)
+- [x] Create `src/db/index.ts`
 
-5. **GitHub**
-   - [x] Initialize git repo
-   - [x] Create `.gitignore` (exclude `.env`, secrets, build artifacts)
-   - [x] Push to GitHub
-   - [x] Document setup in README
+### Phase 4: Document Schema and Define Tools — Complete
 
-**Reference:** [SQL MCP Server - VS Code Quickstart](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/quickstart-visual-studio-code)
+- [x] Create `docs/schema.md` (template for user to fill)
+- [x] Create `src/tools/` structure
+- [x] Define tools: describe_entities, read_records, ping
 
----
+### Phase 5: Implement Core Tools — Complete
 
-### Phase 2: Deploy to Azure (MSDN)
+- [x] Implement `describe_entities` (list tables/columns)
+- [x] Implement `read_records` (query with filters, parameterized)
+- [x] Wire tools into `src/index.ts`
 
-**Goal:** Host the MCP Server on Azure so it can be reached remotely (e.g., by the Discord bot).
+### Phase 6: MCP Client Configuration — Complete
 
-1. **Prerequisites**
-   - [ ] Azure CLI installed
-   - [ ] MSDN subscription with Azure credits
-   - [ ] PowerShell (for deployment script)
+- [x] Update `.cursor/mcp.json` (stdio, command-based)
+- [x] Create `.vscode/mcp.json`
+- [x] Test with Cursor/VS Code
 
-2. **Azure Resources**
-   - [ ] Resource Group
-   - [ ] Azure SQL Server + Database
-   - [ ] Azure Container Registry (ACR)
-   - [ ] Container Apps Environment
-   - [ ] Container App (SQL MCP Server)
+### Phase 7: README and Plan — Complete
 
-3. **Deployment**
-   - [ ] Create `Dockerfile` (Data API Builder image + `dab-config.json`)
-   - [ ] Build and push image to ACR
-   - [ ] Deploy Container App with connection string as secret
-   - [ ] Obtain MCP URL: `https://<app>.azurecontainerapps.io/mcp`
-
-4. **Verification**
-   - [ ] Health check: `curl https://<app>.azurecontainerapps.io/health`
-   - [ ] Connect from VS Code using remote MCP URL
-
-**Reference:** [SQL MCP Server - Azure Container Apps Quickstart](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/quickstart-azure-container-apps)
+- [x] Create new `README.md`
+- [x] Create new `plan.md` (this file)
 
 ---
 
-### Phase 3: Discord Bot (Later)
+## Phase 8: Discord Bot (Later)
 
 **Goal:** Users chat with a Discord bot that uses the MCP Server to query the database.
 
-1. **Bot Setup**
-   - [ ] Create Discord application and bot
-   - [ ] Implement message handler
-
-2. **MCP Client Integration**
-   - [ ] Connect to MCP Server via HTTP (Streamable HTTP transport)
-   - [ ] Implement tool discovery and invocation
-
-3. **LLM Integration**
-   - [ ] Use OpenAPI key for LLM
-   - [ ] Orchestrate: user message → LLM decides tools → call MCP → format response
-
-4. **Hosting**
-   - [ ] Deploy bot (Railway, Render, VPS, or Azure)
+1. Bot Setup — Create Discord application and bot
+2. MCP Client Integration — Connect via HTTP (Streamable HTTP transport)
+3. LLM Integration — Orchestrate user message → LLM → MCP tools → response
+4. Hosting — Deploy bot (Railway, Render, VPS, or Azure)
 
 ---
 
-## Project Structure (Target)
+## Phase 9: Deploy to Azure (Later)
 
-```
-LearningMCP AudioControl/
-├── plan.md                 # This file
-├── README.md               # Setup and usage instructions
-├── dab-config.json         # Data API Builder / MCP config (local dev)
-├── dab-config.azure.json   # Production config for Azure deployment
-├── Dockerfile              # For Azure Container Apps deployment
-├── .env.example            # Template for connection string (no secrets)
-├── .gitignore
-├── .cursor/mcp.json        # Cursor MCP server definition
-├── .vscode/mcp.json        # VS Code MCP server definition
-└── scripts/                # init-db.sql, init-db-azure.sql, deploy-azure.sh
-```
+**Goal:** Host the MCP Server on Azure for remote access.
+
+1. Create Dockerfile for Node.js server
+2. Azure Container Apps deployment
+3. Obtain MCP URL for remote clients
 
 ---
 
 ## Security Notes
 
-- **Never commit** `.env` or connection strings to GitHub.
-- Use `@env('MSSQL_CONNECTION_STRING')` in config; store value in environment.
-- For production: consider managed identity, Key Vault, and restricted permissions.
-
----
-
-## Useful Commands
-
-| Action | Command |
-|--------|---------|
-| Start MCP server locally | `dab start --config dab-config.json` |
-| Initialize DAB config | `dab init --database-type mssql --connection-string "@env('MSSQL_CONNECTION_STRING')" --host-mode Development --config dab-config.json` |
-| Add entity | `dab add <EntityName> --source dbo.<TableName> --permissions "anonymous:read" --description "..."` |
-| Azure login | `az login` |
-| Set subscription | `az account set --subscription "<subscription-id>"` |
+- Never commit `.env` or connection strings to GitHub
+- Use parameterized queries for all user input
+- Consider read-only DB user for query-only tools
+- For production: managed identity, Key Vault, restricted permissions
 
 ---
 
 ## References
 
-- [SQL MCP Server Overview](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/overview)
-- [SQL MCP Server - VS Code Quickstart](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/quickstart-visual-studio-code)
-- [SQL MCP Server - Azure Container Apps Quickstart](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/quickstart-azure-container-apps)
-- [Data API Builder Documentation](https://learn.microsoft.com/en-us/azure/data-api-builder/)
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
+- [MCP SDK - TypeScript](https://github.com/modelcontextprotocol/typescript-sdk)
+- [Build an MCP Server](https://modelcontextprotocol.io/docs/develop/build-server)
+- [mssql npm package](https://www.npmjs.com/package/mssql)
 
 ---
 
