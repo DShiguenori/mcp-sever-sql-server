@@ -1,0 +1,14 @@
+---
+description: Behavior when using SQL MCP server to modify database records
+alwaysApply: true
+---
+
+# SQL MCP Server — Database Modifications
+
+When the user asks to **create**, **add**, **update**, or **delete** records via the SQL MCP server:
+
+1. **Do not invent or assume data.** Never create records with placeholder or made-up values.
+2. **Ask for required details first.** If the user does not provide all necessary fields (e.g., Name, Description, Price, Stock for Products), ask them to supply the missing information.
+3. **Confirm before destructive actions.** For updates and deletes, confirm the target record(s) and values with the user when unclear.
+
+Example: If the user says "add a new product," respond with: "What product would you like to add? Please provide: name, description, price, and stock."

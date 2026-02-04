@@ -22,6 +22,16 @@ export DOTNET_ROOT=$HOME/.dotnet   # Required on some systems
 
 Add these lines to your shell profile (`~/.zshrc` or `~/.bashrc`) for persistence.
 
+### .NET 8 required
+
+Data API Builder 1.7.x requires **.NET 8**. If you see "You must install or update .NET to run this application", install it:
+
+```bash
+brew install dotnet@8
+```
+
+Then ensure .NET 8 is used (or add it to your PATH if needed).
+
 ---
 
 ## Quick Start
@@ -69,14 +79,25 @@ MSSQL_CONNECTION_STRING=Server=localhost,1433;Database=ProductsDb;User Id=sa;Pas
 
 ### 4. Start the MCP server
 
+Port 5050 is used (port 5000 is often taken by macOS Control Center). If you have .NET 8 via Homebrew (`brew install dotnet@8`):
+
 ```bash
-dab start --config dab-config.json
+export PATH="/opt/homebrew/opt/dotnet@8/bin:$HOME/.dotnet/tools:$PATH"
+export DOTNET_ROOT="/opt/homebrew/opt/dotnet@8/libexec"
+ASPNETCORE_URLS=http://localhost:5050 dab start --config dab-config.json
+```
+
+Or, if .NET 8 is your default:
+
+```bash
+export PATH="$PATH:$HOME/.dotnet/tools"
+ASPNETCORE_URLS=http://localhost:5050 dab start --config dab-config.json
 ```
 
 The server listens on:
-- **MCP endpoint:** http://localhost:5000/mcp
-- **REST API:** http://localhost:5000/api
-- **GraphQL:** http://localhost:5000/graphql
+- **MCP endpoint:** http://localhost:5050/mcp
+- **REST API:** http://localhost:5050/api
+- **GraphQL:** http://localhost:5050/graphql
 
 ### 5. Connect from your IDE
 
@@ -88,7 +109,7 @@ The server listens on:
 
 **Cursor:**
 1. Open this project folder in Cursor.
-2. Ensure the DAB server is running (`dab start --config dab-config.json`).
+2. Ensure the DAB server is running (see step 4 above).
 3. The `.cursor/mcp.json` file is preconfigured — Cursor will detect **sql-mcp-server** automatically.
 4. In chat, the AI can use the SQL MCP tools to query your database. Try: *"Which products have stock under 50?"*
 

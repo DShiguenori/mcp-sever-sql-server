@@ -2,7 +2,7 @@
   "servers": {
     "sql-mcp-server": {
       "type": "http",
-      "url": "http://localhost:5000/mcp"
+      "url": "http://localhost:5050/mcp"
     }
   }
 }
